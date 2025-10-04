@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SEOHead from "../components/SEOHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+import HeroBannerSolid from "../components/sections/HeroBannerSolid.astro";
+import Spotlights from "../components/sections/Spotlights.astro";
+import FeaturesGrid from "../components/sections/FeaturesGrid.astro";
+import ContactCTA from "../components/sections/ContactCTA.astro";
+
+import spotlights from "../content/spotlights";
+import features from "../content/features";
+import site from "../config/site";
+---
+
+<BaseLayout>
+  <SEOHead title={`${site.name} — Home`} description={site.tagline} />
+  <Header />
+
+  <main id="main">
+    <HeroBannerSolid
+      title="This is Solid State (Studio Zero edition)"
+      subtitle="A clean, modular Astro + Tailwind rebuild inspired by HTML5 UP — layout preserved, style made our own."
+      ctaText="Get Started"
+      ctaHref="#contact"
+      secondaryText="Learn more"
+      secondaryHref="#features"
+    />
+
+    <Spotlights items={spotlights} />
+
+    <FeaturesGrid id="features" title="What’s inside" items={features} />
+
+    <ContactCTA id="contact" title="Get in touch" />
+  </main>
+
+  <Footer />
+</BaseLayout>

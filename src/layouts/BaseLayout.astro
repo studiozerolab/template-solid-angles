@@ -1,0 +1,17 @@
+---
+import "../styles/global.css";
+
+const { HTMLAttributes = {} } = Astro.props;
+---
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {Astro.slots.has("head") && <slot name="head" />}
+  </head>
+  <body class="antialiased text-text bg-white selection:bg-primary/10 selection:text-text">
+    <slot />
+    {/* Scripts slot if needed */}
+    {Astro.slots.has("scripts") && <slot name="scripts" />}
+  </body>
+</html>
