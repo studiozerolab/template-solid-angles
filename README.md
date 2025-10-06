@@ -2,7 +2,7 @@
 ---
 
 ````markdown
-# Studio Zero — “Solid” Template (`template-solid-alt01`)
+# Studio Zero — “Solid” Template (`template-solid-angles`)
 
 A modular **Astro + Tailwind** website template inspired by **HTML5 UP’s Solid State**, rebuilt from the ground up with reusable components, color tokens, and scalable configuration.
 
@@ -208,7 +208,7 @@ import Header from "../components/HeaderStandard.astro";
 
 When starting a new site:
 
-1. **Copy the entire folder** → rename it (`template-solid-alt02`, `client-name-site`, etc.)
+1. **Copy the entire folder** → rename it (`template-solid-angles`, `client-name-site`, etc.)
 2. Update `package.json → name`
 3. Update repo name on GitHub and remote URL
 
