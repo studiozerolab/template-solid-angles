@@ -1,8 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SEOHead from "../components/SEOHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import Header from "../components/HeaderStandard.astro";
+// import Header from "../components/HeaderSolidPopup.astro";
 
 import HeroBannerSolid from "../components/sections/HeroBannerSolid.astro";
 import Spotlights from "../components/sections/Spotlights.astro";
@@ -12,28 +12,66 @@ import ContactCTA from "../components/sections/ContactCTA.astro";
 import spotlights from "../content/spotlights";
 import features from "../content/features";
 import site from "../config/site";
+import Footer from "../components/Footer.astro";
 ---
-
 <BaseLayout>
   <SEOHead title={`${site.name} — Home`} description={site.tagline} />
   <Header />
 
   <main id="main">
+    <!-- Hero: full width; bottom edge slants LEFT into SURFACE -->
     <HeroBannerSolid
+      bg="primary-tint"
+      bgImage="/assets/hero.jpg"
+      overlayPercent={85}
       title="This is Solid State (Studio Zero edition)"
-      subtitle="A clean, modular Astro + Tailwind rebuild inspired by HTML5 UP — layout preserved, style made our own."
+      subtitle="A faithful layout recreation with brand-agnostic styling, optional angled sections, and swappable image shapes."
       ctaText="Get Started"
       ctaHref="#contact"
       secondaryText="Learn more"
       secondaryHref="#features"
+      anglesTop={false}
+      anglesBottom={true}
+      dirBottom="left"
+      nextBg="surface"
     />
 
-    <Spotlights items={spotlights} />
+    <!-- Spotlights on SURFACE; both edges; next is ALT -->
+    <!-- Spotlights on SURFACE; draw the divider into ALT -->
+    <Spotlights
+      items={spotlights}
+      bg="surface"
+      nextBg="alt"
+      angleTop={true}
+      angleBottom={true}
+      dirTop="right"
+      dirBottom="right"
+      imageShape="circle"
+    />
 
-    <FeaturesGrid id="features" title="What’s inside" items={features} />
+    <!-- What’s inside on ALT; let Spotlights handle the shared boundary -->
+    <FeaturesGrid
+      id="features"
+      title="What's inside"
+      items={features}
+      bg="alt"
+      nextBg="surface"
+      angleTop={false}       
+      angleBottom={true}     
+      dirBottom="left"
+    />
 
-    <ContactCTA id="contact" title="Get in touch" />
+    <!-- Contact on SURFACE; both edges; next (footer) is SURFACE -->
+    <ContactCTA
+      id="contact"
+      title="Get in touch"
+      bg="surface"
+      nextBg="surface"
+      angleTop={true}
+      angleBottom={true}
+      dirTop="right"
+      dirBottom="right"
+    />
+    <Footer />
   </main>
-
-  <Footer />
 </BaseLayout>

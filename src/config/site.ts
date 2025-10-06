@@ -8,7 +8,6 @@ const site = {
     { label: "Twitter", href: "https://twitter.com/", icon: "𝕏" },
     { label: "GitHub", href: "https://github.com/", icon: "{}" },
   ],
-  // Expose theme keys if you want to reference in components
   theme: {
     primary: "#2563EB",
     accent: "#F59E0B",
@@ -17,6 +16,16 @@ const site = {
     text: "#0F172A",
     muted: "#475569",
     line: "#E2E8F0",
+  },
+  images: {
+    hero: "/assets/hero.jpg",
+    footer: "/assets/footer-texture.jpg",
+  },
+  defaults: {
+    headerVariant: "standard", // "standard" | "solidPopup"
+    angles: "bottom",          // "top" | "bottom" | "both" | "none"
+    imageShape: "circle",      // "circle" | "square"
+    sectionBg: "surface",      // "surface" | "alt" | "primary-tint" | "accent-tint"
   },
 };
 

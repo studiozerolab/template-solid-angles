@@ -1,0 +1,50 @@
+---
+import site from "../config/site";
+import PopupMenu from "./nav/PopupMenu.astro";
+---
+<header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-line">
+  <div class="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+    <a href="/" class="font-extrabold tracking-tight text-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30">
+      {site.name}
+    </a>
+    <button
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-line hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+      aria-controls="popup-menu"
+      aria-expanded="false"
+      data-popup-trigger>
+      <span>Menu</span>
+    </button>
+  </div>
+  <PopupMenu />
+</header>
+
+<script is:inline>
+  (function () {
+    const trigger = document.querySelector("[data-popup-trigger]");
+    const overlay = document.querySelector("[data-popup-overlay]");
+    const dialog  = document.querySelector("[data-popup-dialog]");
+    let lastFocused = null;
+
+    function open() {
+      lastFocused = document.activeElement;
+      document.documentElement.classList.add("overflow-hidden");
+      overlay?.classList.remove("opacity-0", "pointer-events-none");
+      dialog?.classList.remove("scale-95", "opacity-0", "pointer-events-none");
+      trigger?.setAttribute("aria-expanded", "true");
+      const first = dialog?.querySelector("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])");
+      first && first.focus();
+    }
+    function close() {
+      document.documentElement.classList.remove("overflow-hidden");
+      overlay?.classList.add("opacity-0", "pointer-events-none");
+      dialog?.classList.add("scale-95", "opacity-0", "pointer-events-none");
+      trigger?.setAttribute("aria-expanded", "false");
+      lastFocused && lastFocused.focus();
+    }
+
+    trigger?.addEventListener("click", open);
+    overlay?.addEventListener("click", close);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    window.__closePopupMenu = close;
+  })();
+</script>

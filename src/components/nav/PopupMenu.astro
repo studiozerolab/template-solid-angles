@@ -1,0 +1,31 @@
+---
+---
+<!-- Overlay -->
+<div data-popup-overlay class="fixed inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-150"></div>
+
+<!-- Dialog -->
+<div
+  id="popup-menu"
+  role="dialog"
+  aria-modal="true"
+  data-popup-dialog
+  class="fixed inset-0 flex items-start justify-center pt-24 pointer-events-none"
+>
+  <div class="pointer-events-auto w-[min(92vw,40rem)] mx-auto rounded-lg border border-line bg-white shadow-xl p-6 transform transition duration-150 scale-95 opacity-0">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold">Menu</h2>
+      <button class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-line hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+              onClick="window.__closePopupMenu && window.__closePopupMenu()">
+        <span class="sr-only">Close menu</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <nav class="grid gap-2 text-sm">
+      <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/">Home</a>
+      <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/generic">Generic</a>
+      <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/elements">Elements</a>
+      <a class="px-3 py-2 rounded-md bg-primary text-white font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/40" href="#contact">Contact</a>
+    </nav>
+  </div>
+</div>

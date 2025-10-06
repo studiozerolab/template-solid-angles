@@ -1,7 +1,7 @@
 ---
+/* Import global + section helpers */
 import "../styles/global.css";
-
-const { HTMLAttributes = {} } = Astro.props;
+import "../styles/sections.css";
 ---
 <html lang="en" class="scroll-smooth">
   <head>
@@ -11,7 +11,6 @@ const { HTMLAttributes = {} } = Astro.props;
   </head>
   <body class="antialiased text-text bg-white selection:bg-primary/10 selection:text-text">
     <slot />
-    {/* Scripts slot if needed */}
     {Astro.slots.has("scripts") && <slot name="scripts" />}
   </body>
 </html>

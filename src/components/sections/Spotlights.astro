@@ -1,10 +1,35 @@
 ---
+import AngleEdge from "../ui/AngleEdge.astro";
 import SpotlightItem from "../ui/SpotlightItem.astro";
-const { items = [] } = Astro.props;
+
+const {
+  items = [],
+  bg = "surface",           // "surface" | "alt" | "primary-tint" | "accent-tint"
+  nextBg = "alt",
+  angleTop = true,
+  angleBottom = true,
+  dirTop = "right",
+  dirBottom = "right",
+  imageShape = "circle",
+} = Astro.props;
+
+const bgClass =
+  bg === "alt" ? "section-alt" :
+  bg === "primary-tint" ? "section-primary-tint" :
+  bg === "accent-tint" ? "section-accent-tint" :
+  "section-surface";
+
+const nextColor =
+  nextBg === "alt" ? "#F8FAFC" :
+  nextBg === "primary-tint" ? "color-mix(in srgb, #2563EB 6%, #ffffff)" :
+  nextBg === "accent-tint" ? "color-mix(in srgb, #F59E0B 6%, #ffffff)" :
+  "#FFFFFF";
 ---
 
-<section class="bg-white">
-  <div class="mx-auto max-w-6xl px-6 py-16 space-y-16">
+<section class={`section ${bgClass}`}>
+  {angleTop && <AngleEdge position="top" direction={dirTop} fill="#FFFFFF" height={120} />}
+
+  <div class="px-6 py-16 space-y-16 content-narrower">
     {items.map((it, i) => (
       <SpotlightItem
         image={it.image}
@@ -12,7 +37,10 @@ const { items = [] } = Astro.props;
         body={it.body}
         href={it.href}
         reverse={i % 2 === 1}
+        imageShape={it.imageShape ?? imageShape}
       />
     ))}
   </div>
+
+  {angleBottom && <AngleEdge position="bottom" direction={dirBottom} fill={nextColor} height={120} />}
 </section>
