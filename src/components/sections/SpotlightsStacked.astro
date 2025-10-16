@@ -1,0 +1,116 @@
+---
+import AngleEdge from "../ui/AngleEdge.astro";
+
+/**
+ * SpotlightsStacked
+ * - Each spotlight is its own mini-section with angled dividers.
+ * - NEW: autoAlternate backgrounds (surface/alt) OR subtle-contrast wedges when bg is same.
+ *
+ * Props:
+ *  - items: { title, body, image, ctaText?, ctaHref? }[]
+ *  - imageShape: "circle" | "square"
+ *  - bg: "surface" | "alt" | "primary-tint" | "accent-tint"   (base bg if not autoAlternate)
+ *  - nextBg: token for the section that follows the last item (default "surface")
+ *  - dirFirst: "left" | "right" (first wedge direction; alternates each item)
+ *  - autoAlternate: boolean (default false) → alternates item backgrounds (surface/alt)
+ *  - sequence: string[] (optional explicit bg sequence; overrides autoAlternate pattern)
+ *  - contrastWhenSame: boolean (default true) → if two adjacent bgs are the same, draw wedge with slight tint so the angle is visible
+ */
+
+const {
+  id = "spotlights-stacked",
+  items = [],
+  imageShape = "circle",
+  bg = "surface",
+  nextBg = "surface",
+  dirFirst = "left",
+  autoAlternate = false,
+  sequence = undefined,
+  contrastWhenSame = true,
+} = Astro.props;
+
+const tokenToClass = (t) =>
+  t === "alt" ? "section-alt"
+  : t === "primary-tint" ? "section-primary-tint"
+  : t === "accent-tint" ? "section-accent-tint"
+  : "section-surface"; // surface
+
+const tokenToFill = (t) =>
+  t === "alt" ? "#F8FAFC"
+  : t === "primary-tint" ? "color-mix(in srgb, #2563EB 6%, #ffffff)"
+  : t === "accent-tint" ? "color-mix(in srgb, #F59E0B 6%, #ffffff)"
+  : "#FFFFFF"; // surface
+
+// Small contrast tweak when two neighbors share the same token
+const contrasted = (t) => {
+  if (!contrastWhenSame) return tokenToFill(t);
+  // slightly darken for visibility; adjust if you want subtler/stronger
+  return `color-mix(in srgb, ${tokenToFill(t)} 92%, black)`;
+};
+
+const imgRound = imageShape === "circle" ? "rounded-full" : "rounded-lg";
+const dirFor = (i) => (i % 2 === 0 ? dirFirst : (dirFirst === "left" ? "right" : "left"));
+
+// Compute the background token for item i
+function bgForIndex(i) {
+  if (sequence && sequence.length) return sequence[i % sequence.length];
+  if (autoAlternate) return i % 2 === 0 ? "surface" : "alt";
+  return bg;
+}
+
+// Compute the wedge fill from current -> next token
+function fillBetween(currToken, nextToken) {
+  if (currToken === nextToken) {
+    // Same bg on both sides: draw a subtle tinted wedge so the angle is visible
+    return contrasted(currToken);
+  }
+  // Otherwise fill with the next section color for a perfect blend
+  return tokenToFill(nextToken);
+}
+---
+
+{items.map((it, i) => {
+  const meToken   = bgForIndex(i);
+  const nextToken = (i < items.length - 1) ? bgForIndex(i + 1) : nextBg;
+
+  const topFill    = tokenToFill(meToken);                 // into me
+  const bottomFill = fillBetween(meToken, nextToken);      // into next
+
+  const reverse = i % 2 === 1;
+  const dir = dirFor(i);
+
+  return (
+    <section id={`${id}-${i}`} class={`section ${tokenToClass(meToken)}`}>
+      {/* TOP: only for items after the first; fill with this item's bg */}
+      {i > 0 && <AngleEdge position="top" direction={dir} fill={topFill} height={110} />}
+
+      <div class="mx-auto max-w-6xl px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-20 md:py-28 grid md:grid-cols-12 gap-x-12 gap-y-10 items-center">
+        <div class={`md:col-span-8 min-w-0 ${reverse ? "md:order-2" : ""}`}>
+          <h3 class="text-2xl md:text-3xl font-bold tracking-tight">{it.title}</h3>
+          <p class="mt-3 text-muted leading-relaxed">{it.body}</p>
+          {it.ctaText && (
+            <div class="mt-5">
+              <a href={it.ctaHref || "#"} class="inline-flex items-center gap-2 rounded-md border border-line px-4 py-2 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+                {it.ctaText}<span aria-hidden="true">○</span>
+              </a>
+            </div>
+          )}
+        </div>
+
+        <div class={`md:col-span-4 ${reverse ? "md:order-1 md:place-self-start" : "md:place-self-end"} place-self-center shrink-0`}>
+          <div class="w-44 md:w-60 lg:w-64 aspect-square">
+            <img
+              src={it.image}
+              alt=""
+              loading="lazy"
+              class={`h-full w-full object-cover ${imgRound} border border-line shadow`}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* BOTTOM: fill with next section color (or subtle contrast if same) */}
+      <AngleEdge position="bottom" direction={dir} fill={bottomFill} height={110} />
+    </section>
+  );
+})}

@@ -1,32 +1,162 @@
 ---
+/**
+ * Mobile-only hamburger that opens a right-side drawer.
+ * - Scoped with data-attrs (no global IDs).
+ * - Starts closed at SSR (no flash).
+ * - Module-safe script (no document.currentScript).
+ */
+const links = [
+  { href: "/", label: "Home" },
+  { href: "#features", label: "Features" },
+  { href: "#contact", label: "Contact" },
+];
 ---
 
-<!-- Overlay -->
-<div data-menu-overlay class="fixed inset-0 bg-black/30 opacity-0 pointer-events-none transition-opacity duration-200 md:hidden"></div>
+<div data-mobilemenu-root class="md:hidden relative">
+  <!-- Toggle -->
+  <button
+    data-mm-toggle
+    class="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+    aria-controls="mobile-drawer"
+    aria-expanded="false"
+    type="button"
+  >
+    <span class="sr-only">Open menu</span>
+    ☰
+  </button>
 
-<!-- Panel -->
-<aside
-  id="mobile-menu"
-  data-menu-panel
-  class="fixed top-0 right-0 h-dvh w-80 max-w-[85vw] bg-white border-l border-line shadow-xl translate-x-full transition-transform duration-200 md:hidden"
-  aria-hidden="true"
->
-  <div class="h-16 flex items-center justify-between px-4 border-b border-line">
-    <span class="font-semibold">Menu</span>
-    <button class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-line hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
-            onClick="window.__closeMenu && window.__closeMenu()">
-      <span class="sr-only">Close menu</span>
-      <!-- X icon -->
-      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </button>
+  <!-- Overlay + Drawer (start closed) -->
+  <div
+    data-mm-panel
+    class="fixed inset-0 z-50 flex items-start justify-end
+           bg-black/20 opacity-0 pointer-events-none
+           transition-opacity duration-300 ease-out"
+    aria-hidden="true"
+    data-state="closed"
+  >
+    <div
+      id="mobile-drawer"
+      data-mm-drawer
+      class="w-[min(85vw,18rem)] h-full bg-white shadow-xl border-l border-slate-200
+             transform-gpu translate-x-full transition-transform duration-300 ease-out"
+      tabindex="-1"
+    >
+      <div class="h-14 flex items-center justify-between px-3 border-b border-slate-200">
+        <span class="text-sm font-semibold">Menu</span>
+        <button
+          data-mm-close
+          class="inline-flex items-center rounded-md border border-slate-300 px-2 py-1 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+          type="button"
+        >✕</button>
+      </div>
+
+      <nav class="p-2">
+        {links.map((l) => (
+          <a
+            href={l.href}
+            data-mm-link
+            class="block rounded-md px-3 py-2 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          >
+            {l.label}
+          </a>
+        ))}
+      </nav>
+    </div>
   </div>
+</div>
 
-  <nav class="p-4 grid gap-2">
-    <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/">Home</a>
-    <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/generic">Generic</a>
-    <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/elements">Elements</a>
-    <a class="px-3 py-2 rounded-md bg-primary text-white font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/40" href="#contact">Contact</a>
-  </nav>
-</aside>
+<script is:inline>
+  (() => {
+    function init(root) {
+      const toggle = root.querySelector('[data-mm-toggle]');
+      const panel  = root.querySelector('[data-mm-panel]');
+      const drawer = root.querySelector('[data-mm-drawer]');
+      const close  = root.querySelector('[data-mm-close]');
+      const links  = root.querySelectorAll('[data-mm-link]');
+      if (!toggle || !panel || !drawer) return;
+
+      let lastFocus = null;
+      const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      // SSR: ensure closed
+      panel.classList.add('opacity-0','pointer-events-none');
+      drawer.classList.add('translate-x-full');
+      panel.dataset.state = 'closed';
+      toggle.setAttribute('aria-expanded', 'false');
+      panel.setAttribute('aria-hidden', 'true');
+
+      function setAria(open) {
+        toggle.setAttribute('aria-expanded', String(open));
+        panel.setAttribute('aria-hidden', String(!open));
+        panel.dataset.state = open ? 'open' : 'closed';
+      }
+
+      function openMenu() {
+        lastFocus = document.activeElement;
+        panel.classList.remove('pointer-events-none');
+
+        if (prefersReduce.matches) {
+          panel.classList.remove('opacity-0'); panel.classList.add('opacity-100');
+          drawer.classList.remove('translate-x-full'); drawer.classList.add('translate-x-0');
+        } else {
+          requestAnimationFrame(() => {
+            panel.classList.remove('opacity-0'); panel.classList.add('opacity-100');
+            drawer.classList.remove('translate-x-full'); drawer.classList.add('translate-x-0');
+          });
+        }
+
+        setAria(true);
+        requestAnimationFrame(() => drawer.focus());
+        document.addEventListener('keydown', onKeyDown);
+        panel.addEventListener('click', onBackdropClick);
+      }
+
+      function closeMenu() {
+        panel.classList.remove('opacity-100'); panel.classList.add('opacity-0');
+        drawer.classList.remove('translate-x-0'); drawer.classList.add('translate-x-full');
+        setAria(false);
+
+        const onEnd = () => {
+          panel.classList.add('pointer-events-none');
+          panel.removeEventListener('transitionend', onEnd);
+        };
+        panel.addEventListener('transitionend', onEnd);
+
+        document.removeEventListener('keydown', onKeyDown);
+        panel.removeEventListener('click', onBackdropClick);
+
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+
+      function onBackdropClick(e) { if (e.target === panel) closeMenu(); }
+
+      function onKeyDown(e) {
+        if (e.key === 'Escape') { e.preventDefault(); closeMenu(); return; }
+        // light focus trap
+        if (e.key === 'Tab' && panel.dataset.state === 'open') {
+          const focusables = panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          const list = Array.from(focusables).filter(el => !el.hasAttribute('disabled'));
+          const first = list[0], last = list[list.length - 1];
+          if (!first || !last) return;
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
+
+      toggle.addEventListener('click', () => {
+        const isOpen = panel.dataset.state === 'open';
+        isOpen ? closeMenu() : openMenu();
+      });
+      close && close.addEventListener('click', closeMenu);
+      links.forEach(a => a.addEventListener('click', closeMenu));
+    }
+
+    // Module-safe: run after DOM is ready, bind to all instances
+    const run = () => document.querySelectorAll('[data-mobilemenu-root]').forEach(init);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  })();
+</script>

@@ -1,50 +1,160 @@
 ---
-import site from "../config/site";
-import PopupMenu from "./nav/PopupMenu.astro";
+/**
+ * Desktop “Solid-style” header with a centered popup menu.
+ * Now closes when clicking ANYWHERE behind it (full-viewport backdrop).
+ */
+const links = [
+  { href: "/", label: "Home" },
+  { href: "#features", label: "Features" },
+  { href: "#contact", label: "Contact" },
+];
 ---
-<header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-line">
-  <div class="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-    <a href="/" class="font-extrabold tracking-tight text-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30">
-      {site.name}
-    </a>
+
+<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between">
+    <a href="/" class="font-semibold">Studio Zero</a>
+
     <button
-      class="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-line hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
-      aria-controls="popup-menu"
+      id="dz-menu-toggle"
+      class="hidden md:inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+      aria-controls="dz-site-menu"
       aria-expanded="false"
-      data-popup-trigger>
-      <span>Menu</span>
+      type="button"
+    >
+      <span class="sr-only">Open menu</span>
+      Menu
     </button>
   </div>
-  <PopupMenu />
+
+  <!-- Backdrop + Popup (will be portaled to <body> at runtime) -->
+  <div
+    id="dz-site-menu"
+    class="fixed inset-0 z-[9999] flex items-start justify-center
+           bg-black/30 md:bg-white/25 md:backdrop-blur
+            backdrop-blur-sm
+           transform-gpu transition duration-300 ease-out
+           opacity-0 -translate-y-4 pointer-events-none"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="dz-site-menu-title"
+    aria-hidden="true"
+    data-state="closed"
+  >
+    <div
+      class="mt-20 w-[min(92vw,28rem)] rounded-lg border border-slate-200 bg-white shadow-xl p-4 z-[10000]"
+      tabindex="-1"
+      data-panel
+    >
+      <div class="flex items-center justify-between">
+        <h2 id="dz-site-menu-title" class="text-base font-semibold">Menu</h2>
+        <button
+          id="dz-menu-close"
+          class="inline-flex items-center rounded-md border border-slate-300 px-2 py-1 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+          type="button"
+        >
+          <span class="sr-only">Close menu</span> ✕
+        </button>
+      </div>
+
+      <nav class="mt-3 grid">
+        {links.map((l) => (
+          <a
+            class="rounded-md px-3 py-2 text-base hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            href={l.href}
+            data-menu-link
+          >
+            {l.label}
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+
+  <script is:inline>
+    (() => {
+      const btn   = document.getElementById('dz-menu-toggle');
+      const popup = document.getElementById('dz-site-menu');
+      const panel = popup?.querySelector('[data-panel]');
+      const closeBtn = document.getElementById('dz-menu-close');
+      const links = popup?.querySelectorAll('[data-menu-link]') || [];
+      if (!btn || !popup || !panel) return;
+
+      let lastFocus = null;
+      const mqlRM = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const OPEN   = ['opacity-100','translate-y-0'];
+      const CLOSED = ['opacity-0','-translate-y-4','pointer-events-none'];
+
+      // PORTAL: ensure the backdrop lives at <body> level so it covers the entire page
+      if (popup.parentElement !== document.body) {
+        document.body.appendChild(popup);
+      }
+
+      // Start closed
+      popup.classList.add(...CLOSED);
+      popup.classList.remove(...OPEN);
+      setAria(false);
+
+      function setAria(open) {
+        btn.setAttribute('aria-expanded', String(open));
+        popup.setAttribute('aria-hidden', String(!open));
+        popup.dataset.state = open ? 'open' : 'closed';
+      }
+
+      function onBackdropClick(e) {
+        // Close only when the click is on the BACKDROP (not inside the panel)
+        if (e.target === popup) closeMenu();
+      }
+
+      function openMenu() {
+        lastFocus = document.activeElement;
+        popup.classList.remove(...CLOSED);
+        popup.classList.add('pointer-events-auto');
+        if (mqlRM.matches) {
+          popup.classList.add('opacity-100','translate-y-0');
+        } else {
+          requestAnimationFrame(() => popup.classList.add('opacity-100','translate-y-0'));
+        }
+        setAria(true);
+        document.documentElement.classList.add('overflow-hidden');
+        requestAnimationFrame(() => panel.focus());
+        document.addEventListener('keydown', onKeyDown);
+        popup.addEventListener('click', onBackdropClick);
+      }
+
+      function closeMenu() {
+        popup.classList.remove('opacity-100','translate-y-0');
+        popup.classList.add('opacity-0','-translate-y-4');
+        setAria(false);
+        const done = () => {
+          popup.classList.add('pointer-events-none');
+          popup.removeEventListener('transitionend', done);
+        };
+        popup.addEventListener('transitionend', done);
+        document.documentElement.classList.remove('overflow-hidden');
+        document.removeEventListener('keydown', onKeyDown);
+        popup.removeEventListener('click', onBackdropClick);
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+
+      function onKeyDown(e) {
+        if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+        // light focus trap
+        if (e.key === 'Tab' && popup.dataset.state === 'open') {
+          const focusables = popup.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          const list = Array.from(focusables).filter(el => !el.hasAttribute('disabled'));
+          const first = list[0], last = list[list.length - 1];
+          if (!first || !last) return;
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
+
+      btn.addEventListener('click', () => {
+        const open = popup.dataset.state === 'open';
+        open ? closeMenu() : openMenu();
+      });
+      closeBtn?.addEventListener('click', closeMenu);
+      links.forEach(a => a.addEventListener('click', closeMenu));
+    })();
+  </script>
 </header>
-
-<script is:inline>
-  (function () {
-    const trigger = document.querySelector("[data-popup-trigger]");
-    const overlay = document.querySelector("[data-popup-overlay]");
-    const dialog  = document.querySelector("[data-popup-dialog]");
-    let lastFocused = null;
-
-    function open() {
-      lastFocused = document.activeElement;
-      document.documentElement.classList.add("overflow-hidden");
-      overlay?.classList.remove("opacity-0", "pointer-events-none");
-      dialog?.classList.remove("scale-95", "opacity-0", "pointer-events-none");
-      trigger?.setAttribute("aria-expanded", "true");
-      const first = dialog?.querySelector("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])");
-      first && first.focus();
-    }
-    function close() {
-      document.documentElement.classList.remove("overflow-hidden");
-      overlay?.classList.add("opacity-0", "pointer-events-none");
-      dialog?.classList.add("scale-95", "opacity-0", "pointer-events-none");
-      trigger?.setAttribute("aria-expanded", "false");
-      lastFocused && lastFocused.focus();
-    }
-
-    trigger?.addEventListener("click", open);
-    overlay?.addEventListener("click", close);
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
-    window.__closePopupMenu = close;
-  })();
-</script>

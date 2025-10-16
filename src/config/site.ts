@@ -18,7 +18,8 @@ const site = {
     line: "#E2E8F0",
   },
   images: {
-    hero: "/assets/hero.jpg",
+    hero: "https://picsum.photos/1200/800",
+    // hero: "/assets/hero.jpg",
     footer: "/assets/footer-texture.jpg",
   },
   defaults: {

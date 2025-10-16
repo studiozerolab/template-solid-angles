@@ -3,6 +3,8 @@ import site from "../config/site";
 ---
 
 <footer class={`mt-20 border-t border-line footer-image`} style={`--footer-image: url('${site.images.footer}');`}>
+
+  <div class="bg-white/60">
   <div class="mx-auto max-w-6xl px-6 py-12 grid gap-10 md:grid-cols-3">
     <div class="space-y-2">
       <div class="font-extrabold tracking-tight text-xl">{site.name}</div>
@@ -39,6 +41,7 @@ import site from "../config/site";
       </div>
     </div>
   </div>
+  </div>
 
   <div class="border-t border-line bg-white/80 backdrop-blur">
     <div class="mx-auto max-w-6xl px-6 py-4 text-xs text-muted flex items-center justify-between">
@@ -47,3 +50,4 @@ import site from "../config/site";
     </div>
   </div>
 </footer>
+</div>

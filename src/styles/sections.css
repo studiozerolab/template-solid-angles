@@ -55,3 +55,14 @@
 .card-vitae p { color: #475569; margin: 0 0 .75rem; }
 .card-vitae .cta { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem .85rem; border: 1px solid var(--line,#E2E8F0); border-radius: .5rem; }
 .card-vitae .cta::before { content: "○"; opacity: .75; font-size: .9rem; }
+
+/* ===== Footer background (texture/image) ===== */
+.footer-image {
+  /* fallback if site.images.footer is empty */
+  --footer-image: var(--footer-image, url("/assets/footer.jpg"));
+  background-image: var(--footer-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}

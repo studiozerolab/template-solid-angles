@@ -1,45 +1,70 @@
 ---
 import AngleEdge from "../ui/AngleEdge.astro";
-import SpotlightItem from "../ui/SpotlightItem.astro";
 
+/** Consistent text width (8/12) + image (4/12), alternating per row */
 const {
+  id = "features",
   items = [],
-  bg = "surface",           // "surface" | "alt" | "primary-tint" | "accent-tint"
-  nextBg = "alt",
+  imageShape = "circle",        // "circle" | "square"
+  bg = "surface",
+  nextBg = "surface",
   angleTop = true,
   angleBottom = true,
-  dirTop = "right",
-  dirBottom = "right",
-  imageShape = "circle",
+  dirTop = "left",
+  dirBottom = "left",
 } = Astro.props;
 
 const bgClass =
-  bg === "alt" ? "section-alt" :
-  bg === "primary-tint" ? "section-primary-tint" :
-  bg === "accent-tint" ? "section-accent-tint" :
-  "section-surface";
+  bg === "alt" ? "section-alt"
+  : bg === "primary-tint" ? "section-primary-tint"
+  : bg === "accent-tint" ? "section-accent-tint"
+  : "section-surface";
 
 const nextColor =
-  nextBg === "alt" ? "#F8FAFC" :
-  nextBg === "primary-tint" ? "color-mix(in srgb, #2563EB 6%, #ffffff)" :
-  nextBg === "accent-tint" ? "color-mix(in srgb, #F59E0B 6%, #ffffff)" :
-  "#FFFFFF";
+  nextBg === "alt" ? "#F8FAFC"
+  : nextBg === "primary-tint" ? "color-mix(in srgb, #2563EB 6%, #ffffff)"
+  : nextBg === "accent-tint" ? "color-mix(in srgb, #F59E0B 6%, #ffffff)"
+  : "#FFFFFF";
+
+const imgRound = imageShape === "circle" ? "rounded-full" : "rounded-lg";
 ---
 
-<section class={`section ${bgClass}`}>
+<section id={id} class={`section ${bgClass}`}>
   {angleTop && <AngleEdge position="top" direction={dirTop} fill="#FFFFFF" height={120} />}
 
-  <div class="px-6 py-16 space-y-16 content-narrower">
-    {items.map((it, i) => (
-      <SpotlightItem
-        image={it.image}
-        title={it.title}
-        body={it.body}
-        href={it.href}
-        reverse={i % 2 === 1}
-        imageShape={it.imageShape ?? imageShape}
-      />
-    ))}
+  <!-- Symmetric responsive container padding -->
+  <div class="mx-auto max-w-6xl px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-20 md:py-28 space-y-16 md:space-y-20">
+    {items.map((it, i) => {
+      const reverse = i % 2 === 1;
+      return (
+        <div class="grid md:grid-cols-12 items-center gap-x-12 gap-y-10">
+          <!-- Text 8/12 -->
+          <div class={`md:col-span-8 min-w-0 ${reverse ? "md:order-2" : ""}`}>
+            <h3 class="text-2xl md:text-3xl font-bold tracking-tight">{it.title}</h3>
+            <p class="mt-3 text-muted leading-relaxed">{it.body}</p>
+            {it.ctaText && (
+              <div class="mt-5">
+                <a href={it.ctaHref || "#"} class="inline-flex items-center gap-2 rounded-md border border-line px-4 py-2 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  {it.ctaText}<span aria-hidden="true">○</span>
+                </a>
+              </div>
+            )}
+          </div>
+
+          <!-- Image 4/12; square, non-shrinking -->
+          <div class={`md:col-span-4 ${reverse ? "md:order-1 md:place-self-start" : "md:place-self-end"} place-self-center shrink-0`}>
+            <div class="w-44 md:w-60 lg:w-64 aspect-square">
+              <img
+                src={it.image}
+                alt=""
+                loading="lazy"
+                class={`h-full w-full object-cover ${imgRound} border border-line shadow`}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    })}
   </div>
 
   {angleBottom && <AngleEdge position="bottom" direction={dirBottom} fill={nextColor} height={120} />}

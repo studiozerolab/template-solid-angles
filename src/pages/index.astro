@@ -2,10 +2,13 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SEOHead from "../components/SEOHead.astro";
 import Header from "../components/HeaderStandard.astro";
-// import Header from "../components/HeaderSolidPopup.astro";
+// import Header2 from "../components/Header.astro";
+import HeaderPopup from "../components/HeaderSolidPopup.astro";
 
 import HeroBannerSolid from "../components/sections/HeroBannerSolid.astro";
+import AboutSimple from "../components/sections/About.astro";
 import Spotlights from "../components/sections/Spotlights.astro";
+import SpotlightsStacked from "../components/sections/SpotlightsStacked.astro";
 import FeaturesGrid from "../components/sections/FeaturesGrid.astro";
 import ContactCTA from "../components/sections/ContactCTA.astro";
 
@@ -16,23 +19,39 @@ import Footer from "../components/Footer.astro";
 ---
 <BaseLayout>
   <SEOHead title={`${site.name} — Home`} description={site.tagline} />
+  
+  <!-- Mobile header (shows hamburger only on < md) -->
+<div class="md:hidden">
   <Header />
+</div>
+
+<!-- Desktop header (shows “Menu” button only on ≥ md) -->
+<div class="hidden md:block">
+  <HeaderPopup />
+</div>
 
   <main id="main">
     <!-- Hero: full width; bottom edge slants LEFT into SURFACE -->
     <HeroBannerSolid
       bg="primary-tint"
-      bgImage="/assets/hero.jpg"
+      bgImage="https://picsum.photos/1200/800"
       overlayPercent={85}
-      title="This is Solid State (Studio Zero edition)"
-      subtitle="A faithful layout recreation with brand-agnostic styling, optional angled sections, and swappable image shapes."
+      title="This is STUDIO ZERO"
+      subtitle="A layout with brand-agnostic styling, optional angled sections, and swappable image shapes."
       ctaText="Get Started"
       ctaHref="#contact"
       secondaryText="Learn more"
       secondaryHref="#features"
       anglesTop={false}
       anglesBottom={true}
-      dirBottom="left"
+      dirBottom="right"
+      nextBg="alt"
+    />
+
+    <AboutSimple
+      title="About Studio Zero"
+      body="Studio Zero creates simple, modern websites built for real people and small businesses. We focus on usability, speed, and clean design—so you can focus on what you do best."
+      image="/assets/about.jpg"
       nextBg="surface"
     />
 
@@ -61,15 +80,41 @@ import Footer from "../components/Footer.astro";
       dirBottom="left"
     />
 
+    <SpotlightsStacked
+      autoAlternate={true}
+      nextBg="alt"              
+      items={spotlights}
+    />
+    <!-- 
+        autoAlternate={true}          surface, alt, surface, alt...
+        nextBg="surface"              whatever the next real section uses 
+    -->
+  <!--
+    **Custom sequence (explicit control)**
+    <SpotlightsStacked
+      sequence={["surface","alt","primary-tint","surface"]}
+      nextBg="alt"
+      items={spotlights}
+    /> 
+
+    **Single background but still visible angles**
+    <SpotlightsStacked
+      bg="surface"
+      nextBg="alt"
+      contrastWhenSame={true}       default: true
+      items={spotlights}
+    />
+  -->
+
     <!-- Contact on SURFACE; both edges; next (footer) is SURFACE -->
     <ContactCTA
       id="contact"
       title="Get in touch"
-      bg="surface"
-      nextBg="surface"
-      angleTop={true}
+      bg="alt"
+      nextBg="alt"
+      angleTop={false}
       angleBottom={true}
-      dirTop="right"
+      dirTop="left"
       dirBottom="right"
     />
     <Footer />

@@ -1,31 +1,153 @@
 ---
+/**
+ * Popup menu (Solid-style) with no inline events (so TS is happy).
+ * - No global IDs; everything is scoped to this component instance.
+ * - Starts closed at SSR (no flash).
+ * - ESC to close, backdrop click closes, clicking a link closes.
+ */
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/generic", label: "Generic" },
+  { href: "/elements", label: "Elements" },
+  { href: "#contact", label: "Contact" },
+];
 ---
-<!-- Overlay -->
-<div data-popup-overlay class="fixed inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-150"></div>
 
-<!-- Dialog -->
-<div
-  id="popup-menu"
-  role="dialog"
-  aria-modal="true"
-  data-popup-dialog
-  class="fixed inset-0 flex items-start justify-center pt-24 pointer-events-none"
->
-  <div class="pointer-events-auto w-[min(92vw,40rem)] mx-auto rounded-lg border border-line bg-white shadow-xl p-6 transform transition duration-150 scale-95 opacity-0">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold">Menu</h2>
-      <button class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-line hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
-              onClick="window.__closePopupMenu && window.__closePopupMenu()">
-        <span class="sr-only">Close menu</span>
-        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
+<div data-popup-root class="relative">
+  <!-- Trigger (NOTE: no onClick/onclick attribute) -->
+  <button
+    type="button"
+    data-popup-toggle
+    class="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+    aria-controls="popup-panel"
+    aria-expanded="false"
+  >
+    <span class="sr-only">Open menu</span>
+    Menu
+  </button>
+
+  <!-- Overlay + panel (SSR: closed, off-screen, non-interactive) -->
+  <div
+    data-popup-panel
+    id="popup-panel"
+    class="fixed inset-0 z-50 flex items-start justify-center
+           bg-white/95 backdrop-blur
+           opacity-0 -translate-y-4 pointer-events-none
+           transform-gpu transition duration-300 ease-out"
+    aria-hidden="true"
+    data-state="closed"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="popup-title"
+  >
+    <div class="mt-20 w-[min(92vw,28rem)] rounded-lg border border-slate-200 bg-white shadow-xl p-4" tabindex="-1">
+      <div class="flex items-center justify-between">
+        <h2 id="popup-title" class="text-base font-semibold">Menu</h2>
+        <button
+          type="button"
+          data-popup-close
+          class="inline-flex items-center rounded-md border border-slate-300 px-2 py-1 text-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+        >
+          <span class="sr-only">Close menu</span> ✕
+        </button>
+      </div>
+
+      <nav class="mt-3 grid">
+        {links.map((l) => (
+          <a
+            href={l.href}
+            data-popup-link
+            class="rounded-md px-3 py-2 text-base hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          >
+            {l.label}
+          </a>
+        ))}
+      </nav>
     </div>
-
-    <nav class="grid gap-2 text-sm">
-      <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/">Home</a>
-      <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/generic">Generic</a>
-      <a class="px-3 py-2 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30" href="/elements">Elements</a>
-      <a class="px-3 py-2 rounded-md bg-primary text-white font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/40" href="#contact">Contact</a>
-    </nav>
   </div>
 </div>
+
+<!-- Scoped behavior (no inline handlers, no global IDs) -->
+<script is:inline>
+  (() => {
+    const root  = document.currentScript?.closest('[data-popup-root]');
+    if (!root) return;
+
+    const toggle = root.querySelector('[data-popup-toggle]');
+    const panel  = root.querySelector('[data-popup-panel]');
+    const close  = root.querySelector('[data-popup-close]');
+    const links  = root.querySelectorAll('[data-popup-link]');
+    const dialog = panel?.querySelector('[tabindex="-1"]');
+
+    if (!toggle || !panel || !dialog) return;
+
+    let lastFocus = null;
+    const mqlRM = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function setAria(open) {
+      toggle.setAttribute('aria-expanded', String(open));
+      panel.setAttribute('aria-hidden', String(!open));
+      panel.dataset.state = open ? 'open' : 'closed';
+    }
+
+    // Ensure SSR starts closed (prevents flash)
+    panel.classList.add('opacity-0','-translate-y-4','pointer-events-none');
+    setAria(false);
+
+    function openMenu() {
+      lastFocus = document.activeElement;
+      panel.classList.remove('pointer-events-none');
+      if (mqlRM.matches) {
+        panel.classList.add('opacity-100','translate-y-0');
+        panel.classList.remove('opacity-0','-translate-y-4');
+      } else {
+        requestAnimationFrame(() => {
+          panel.classList.add('opacity-100','translate-y-0');
+          panel.classList.remove('opacity-0','-translate-y-4');
+        });
+      }
+      setAria(true);
+      requestAnimationFrame(() => dialog.focus());
+      document.addEventListener('keydown', onKeyDown);
+      panel.addEventListener('click', onBackdrop, { capture: false });
+    }
+
+    function closeMenu() {
+      panel.classList.remove('opacity-100','translate-y-0');
+      panel.classList.add('opacity-0','-translate-y-4');
+      setAria(false);
+      const done = () => {
+        panel.classList.add('pointer-events-none');
+        panel.removeEventListener('transitionend', done);
+      };
+      panel.addEventListener('transitionend', done);
+      document.removeEventListener('keydown', onKeyDown);
+      panel.removeEventListener('click', onBackdrop);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    function onBackdrop(e) {
+      // Only close if the click is on the overlay, not inside the dialog
+      if (e.target === panel) closeMenu();
+    }
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+      // very light focus trap
+      if (e.key === 'Tab' && panel.dataset.state === 'open') {
+        const focusables = panel.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+        const list = Array.from(focusables).filter(el => !el.hasAttribute('disabled'));
+        const first = list[0], last = list[list.length - 1];
+        if (!first || !last) return;
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+
+    toggle.addEventListener('click', () => {
+      panel.dataset.state === 'open' ? closeMenu() : openMenu();
+    });
+    close?.addEventListener('click', closeMenu);
+    links.forEach(a => a.addEventListener('click', closeMenu));
+  })();
+</script>
