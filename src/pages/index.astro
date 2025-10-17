@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SEOHead from "../components/SEOHead.astro";
 import Header from "../components/HeaderStandard.astro";
-// import Header2 from "../components/Header.astro";
 import HeaderPopup from "../components/HeaderSolidPopup.astro";
 
 import HeroBannerSolid from "../components/sections/HeroBannerSolid.astro";
@@ -10,7 +9,7 @@ import AboutSimple from "../components/sections/About.astro";
 import Spotlights from "../components/sections/Spotlights.astro";
 import SpotlightsStacked from "../components/sections/SpotlightsStacked.astro";
 import FeaturesGrid from "../components/sections/FeaturesGrid.astro";
-import ContactCTA from "../components/sections/ContactCTA.astro";
+import ContactCTA from "../components/sections/Contact.astro";
 
 import spotlights from "../content/spotlights";
 import features from "../content/features";
@@ -19,15 +18,18 @@ import Footer from "../components/Footer.astro";
 ---
 <BaseLayout>
   <SEOHead title={`${site.name} — Home`} description={site.tagline} />
-  
-  <!-- Mobile header (shows hamburger only on < md) -->
-<div class="md:hidden">
+
   <Header />
+
+<!-- ** Use the following two for desktop popup ** -->
+ <!-- Mobile header (shows hamburger only on < md) -->
+<div class="md:hidden">
+  <!-- <Header /> -->
 </div>
 
-<!-- Desktop header (shows “Menu” button only on ≥ md) -->
+<!-- Desktop header (shows “Menu” button only on ≥ md) HeaderSolidPopup.astro -->
 <div class="hidden md:block">
-  <HeaderPopup />
+  <!-- <HeaderPopup /> -->
 </div>
 
   <main id="main">
@@ -85,10 +87,7 @@ import Footer from "../components/Footer.astro";
       nextBg="alt"              
       items={spotlights}
     />
-    <!-- 
-        autoAlternate={true}          surface, alt, surface, alt...
-        nextBg="surface"              whatever the next real section uses 
-    -->
+
   <!--
     **Custom sequence (explicit control)**
     <SpotlightsStacked
