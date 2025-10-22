@@ -3,13 +3,13 @@ import site from "../../config/site";
 import AngleEdge from "../ui/AngleEdge.astro";
 
 const {
-  id = "contact",
-  bg = "surface",             // surface | alt | primary-tint | accent-tint
-  angleTop = true,
-  angleBottom = false,
-  dirTop = "left",
-  dirBottom = "left",
-  nextBg = "surface",
+  id,
+  bg,           // surface | alt | primary-tint | accent-tint
+  angleTop ,    // boolean
+  angleBottom,  // boolean
+  dirTop,       // left | right
+  dirBottom,    // left | right
+  nextBg,       // surface | alt | primary-tint | accent-tint
 } = Astro.props;
 
 const bgClass =

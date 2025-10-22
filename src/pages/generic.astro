@@ -1,9 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SEOHead from "../components/SEOHead.astro";
-import Header from "../components/Header.astro";
-import Header1 from "../components/HeaderStandard.astro";
-import HeaderPopup from "../components/HeaderSolidPopup.astro";
+import HeaderFrame from "../components/header/HeaderFrame.astro";
 import Footer from "../components/Footer.astro";
 import Section from "../components/ui/Section.astro";
 import site from "../config/site";
@@ -11,18 +9,18 @@ import site from "../config/site";
 
 <BaseLayout>
   <SEOHead title="Generic Page" description={site.tagline} />
-  <!-- <Header1 /> -->
 
+<HeaderFrame variant="bar" />
 <!-- ** Use the following two for desktop popup ** -->
  <!-- Mobile header (shows hamburger only on < md) -->
-<div class="md:hidden">
+<!-- <div class="md:hidden">
   <Header />
-</div>
+</div> -->
 
 <!-- Desktop header (shows “Menu” button only on ≥ md) HeaderSolidPopup.astro -->
-<div class="hidden md:block">
+<!-- <div class="hidden md:block">
   <HeaderPopup />
-</div>
+</div> -->
 
 
 

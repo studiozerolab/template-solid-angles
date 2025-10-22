@@ -3,15 +3,15 @@ import AngleEdge from "../ui/AngleEdge.astro";
 
 /** Consistent text width (8/12) + image (4/12), alternating per row */
 const {
-  id = "features",
+  id,
   items = [],
-  imageShape = "circle",        // "circle" | "square"
-  bg = "surface",
-  nextBg = "surface",
-  angleTop = true,
-  angleBottom = true,
-  dirTop = "left",
-  dirBottom = "left",
+  imageShape,       // "circle" | "square"
+  bg,               // surface | alt | primary-tint | accent-tint
+  nextBg,
+  angleTop,         // left | right
+  angleBottom,
+  dirTop,           // left | right
+  dirBottom,
 } = Astro.props;
 
 const bgClass =

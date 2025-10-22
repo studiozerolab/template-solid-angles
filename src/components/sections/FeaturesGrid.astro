@@ -3,14 +3,14 @@ import AngleEdge from "../ui/AngleEdge.astro";
 
 const {
   id,
-  title = "What’s inside",
+  title,
   items = [],
-  bg = "alt",
-  nextBg = "surface",
-  angleTop = true,
-  angleBottom = true,
-  dirTop = "left",
-  dirBottom = "left",
+  bg,       // surface | alt | primary-tint | accent-tint
+  nextBg,
+  angleTop,
+  angleBottom,
+  dirTop,   // left | right
+  dirBottom, // left | right
 } = Astro.props;
 
 const bgClass =

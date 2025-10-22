@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SEOHead from "../components/SEOHead.astro";
-import Header from "../components/Header.astro";
+import HeaderFrame from "../components/header/HeaderFrame.astro";
 import Footer from "../components/Footer.astro";
 import Section from "../components/ui/Section.astro";
 import site from "../config/site";
@@ -9,7 +9,7 @@ import site from "../config/site";
 
 <BaseLayout>
   <SEOHead title="Elements" description="Type, buttons, forms, and components" />
-  <Header />
+  <HeaderFrame variant="bar" />
 
   <main id="main">
     <Section as="section">

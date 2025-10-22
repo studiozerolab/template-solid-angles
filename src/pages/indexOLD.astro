@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SEOHead from "../components/SEOHead.astro";
-import HeaderFrame from "../components/header/HeaderFrame.astro";
+import Header from "../components/HeaderStandard.astro";
+import HeaderPopup from "../components/HeaderSolidPopup.astro";
 
 import HeroBannerSolid from "../components/sections/HeroBannerSolid.astro";
 import AboutSimple from "../components/sections/About.astro";
@@ -18,20 +19,18 @@ import Footer from "../components/Footer.astro";
 <BaseLayout>
   <SEOHead title={`${site.name} — Home`} description={site.tagline} />
 
-  <!-- <HeaderFrame variant="popup" /> -->
-  <HeaderFrame variant="bar" />
   <!-- <Header /> -->
 
 <!-- ** Use the following two for desktop popup ** -->
  <!-- Mobile header (shows hamburger only on < md) -->
-<!-- <div class="md:hidden">
+<div class="md:hidden">
   <Header />
-</div> -->
+</div>
 
 <!-- Desktop header (shows “Menu” button only on ≥ md) HeaderSolidPopup.astro -->
-<!-- <div class="hidden md:block">
+<div class="hidden md:block">
   <HeaderPopup />
-</div> -->
+</div>
 
   <main id="main">
     <!-- Hero: full width; bottom edge slants LEFT into SURFACE -->
@@ -47,27 +46,20 @@ import Footer from "../components/Footer.astro";
       secondaryHref="#features"
       anglesTop={false}
       anglesBottom={true}
-      dirTop="left"
       dirBottom="right"
       nextBg="alt"
     />
 
     <AboutSimple
-      id="about"
       title="About Studio Zero"
+      body="Studio Zero creates simple, modern websites built for real people and small businesses. We focus on usability, speed, and clean design—so you can focus on what you do best."
       image="/assets/about.jpg"
-      bg="alt"
       nextBg="surface"
-      angleTop={false}
-      angleBottom={true}
-      dirTop="right"
-      dirBottom="left"
     />
 
     <!-- Spotlights on SURFACE; both edges; next is ALT -->
     <!-- Spotlights on SURFACE; draw the divider into ALT -->
     <Spotlights
-      id="features"
       items={spotlights}
       bg="surface"
       nextBg="alt"
@@ -86,16 +78,12 @@ import Footer from "../components/Footer.astro";
       bg="alt"
       nextBg="surface"
       angleTop={false}       
-      angleBottom={true} 
-      dirTop="left"    
+      angleBottom={true}     
       dirBottom="left"
     />
 
     <SpotlightsStacked
-      id = "features"
       autoAlternate={true}
-      dirFirst="left"
-      bg="surface"
       nextBg="alt"              
       items={spotlights}
     />

@@ -1,5 +1,6 @@
 const site = {
   name: "Studio Zero",
+  logoAlt: "Studio Zero",
   tagline: "Modern, modular templates for real-world small businesses.",
   email: "hello@example.com",
   phone: "(555) 555-1212",

@@ -9,18 +9,18 @@ import AngleEdge from "../ui/AngleEdge.astro";
  */
 
 const {
-  id = "about",
-  title = "About",
+  id,
+  title,
   subtitle = "",
-  body = "We build modern, mobile-friendly websites with a focus on clean design, performance, and usability. Studio Zero helps small businesses and independent creators bring their ideas online—simple, affordable, and fast.",
-  image = "/assets/about.jpg",
+  body = "Studio Zero creates simple, modern websites built for real people and small businesses. We focus on usability, speed, and clean design—so you can focus on what you do best.",
+  image,
   showImage = true,
-  bg = "alt",          // surface | alt | primary-tint | accent-tint
-  nextBg = "surface",
-  angleTop = false,
-  angleBottom = true,
-  dirTop = "left",
-  dirBottom = "left",
+  bg,          // surface | alt | primary-tint | accent-tint
+  nextBg,
+  angleTop,   // boolean
+  angleBottom,
+  dirTop,  // left | right
+  dirBottom,
 } = Astro.props;
 
 const bgClass =

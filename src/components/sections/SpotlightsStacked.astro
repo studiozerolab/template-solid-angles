@@ -18,13 +18,13 @@ import AngleEdge from "../ui/AngleEdge.astro";
  */
 
 const {
-  id = "spotlights-stacked",
+  id,
   items = [],
   imageShape = "circle",
-  bg = "surface",
-  nextBg = "surface",
-  dirFirst = "left",
-  autoAlternate = false,
+  bg,           // surface | alt | primary-tint | accent-tint
+  nextBg,       // surface | alt | primary-tint | accent-tint
+  dirFirst,     // left | right
+  autoAlternate,  // boolean
   sequence = undefined,
   contrastWhenSame = true,
 } = Astro.props;
