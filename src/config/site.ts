@@ -2,7 +2,7 @@ const site = {
   name: "Studio Zero",
   logoAlt: "Studio Zero",
   tagline: "Modern, modular templates for real-world small businesses.",
-  email: "hello@example.com",
+  email: "info@studiozerolab.com.com",
   phone: "(555) 555-1212",
   address: "123 Main St, Anytown, USA",
   socials: [
